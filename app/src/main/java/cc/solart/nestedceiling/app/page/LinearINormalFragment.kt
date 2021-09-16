@@ -62,7 +62,7 @@ class LinearINormalFragment : Fragment() {
     fun resetToTop() {
         recyclerView?.let {
             val mLayoutManager = it.layoutManager as LinearLayoutManager
-            mLayoutManager.scrollToPositionWithOffset(0, 0)
+            //mLayoutManager.scrollToPositionWithOffset(0, 0)
         }
     }
 }

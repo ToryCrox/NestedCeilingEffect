@@ -19,7 +19,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".page.NestedParentRecyclerViewActivity" />
-        <activity android:name=".page.NestedParentScrollViewActivity" />
 
     </application>
 </manifest>

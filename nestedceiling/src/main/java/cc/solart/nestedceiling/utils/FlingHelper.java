@@ -10,7 +10,7 @@ public final class FlingHelper {
     private int mMaxFlingVelocity;
 
     public FlingHelper(Context context) {
-        this(context, 0.38f);
+        this(context, 0.6f);
     }
 
     public FlingHelper(Context context, float factor) {
@@ -42,6 +42,6 @@ public final class FlingHelper {
 
     /* 限制加速的最大值 */
     public int getFlingVelocity(int velocity) {
-        return Math.max(-mMaxFlingVelocity, Math.min(velocity, mMaxFlingVelocity));
+        return velocity;//Math.max(-mMaxFlingVelocity, Math.min(velocity, mMaxFlingVelocity));
     }
 }

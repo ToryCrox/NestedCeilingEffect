@@ -13,17 +13,23 @@ import cc.solart.nestedceiling.widget.NestedParentRecyclerView;
 public final class FindTarget {
 
     @Nullable
-    public static RecyclerView findChildScrollTarget(ViewGroup contentView) {
+    public static NestedChildRecyclerView findChildScrollTarget(ViewGroup contentView) {
         if(contentView == null) return null;
         for (int i = 0; i < contentView.getChildCount(); i++) {
             View view = contentView.getChildAt(i);
-            if(view instanceof RecyclerView && view.getClass() == NestedChildRecyclerView.class){
-                return (RecyclerView) view;
+            int centerX = (view.getLeft() + view.getRight()) / 2;
+            int contentLeft = contentView.getScrollX();
+            if (centerX <= contentLeft || centerX >= contentLeft + contentView.getWidth()) {
+                continue;
+            }
+            NestedChildRecyclerView target = null;
+            if(view instanceof NestedChildRecyclerView){
+                target = (NestedChildRecyclerView) view;
             } else if(view instanceof ViewGroup){
-                RecyclerView target = findChildScrollTarget((ViewGroup) view);
-                if(target != null){
-                    return target;
-                }
+                target = findChildScrollTarget((ViewGroup) view);
+            }
+            if(target != null){
+                return target;
             }
         }
         return null;

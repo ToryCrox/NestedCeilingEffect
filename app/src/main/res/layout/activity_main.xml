@@ -11,7 +11,7 @@
         android:id="@+id/btn1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="NestedPrentScrollView 示例"
+        android:text="NestedPrentRecyclerView 示例 viewPager"
         android:textAllCaps="false"
         android:layout_marginVertical="20dp"/>
 
@@ -20,7 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAllCaps="false"
-        android:text="NestedPrentRecyclerView 示例"
+        android:text="NestedPrentRecyclerView 示例 viewPager2"
         android:layout_marginVertical="20dp" />
 
 </LinearLayout>
