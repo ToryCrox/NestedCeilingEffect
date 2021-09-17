@@ -7,17 +7,18 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import cc.solart.nestedceiling.app.R
-import cc.solart.nestedceiling.app.adapter.item.BannerItem
-import cc.solart.nestedceiling.app.adapter.item.LastItem
-import cc.solart.nestedceiling.app.adapter.item.NormalItem
-import cc.solart.nestedceiling.app.model.BannerData
-import cc.solart.nestedceiling.app.model.Last
+import cc.solart.nestedceiling.app.adapter.item.*
+import cc.solart.nestedceiling.app.model.*
 import cc.solart.nestedceiling.widget.NestedParentRecyclerView
 import cc.solart.nestedceiling.widget.OnChildAttachStateListener
 import com.drakeet.multitype.MultiTypeAdapter
 import java.util.*
 
 class NestedParentRecyclerViewActivity : AppCompatActivity() {
+
+
+    private val isViewPager2: Boolean
+        get() = intent?.getBooleanExtra("isViewPager2", false) == true
 
     private val data: List<Any>
         get() {
@@ -26,7 +27,11 @@ class NestedParentRecyclerViewActivity : AppCompatActivity() {
             data.add(R.drawable.drawable_icons)
             data.add(R.drawable.drawable_new)
             data.add(R.drawable.drawable_recommend)
-            data.add(Last())
+            if (isViewPager2) {
+                data.add(LastViewPager2())
+            } else {
+                data.add(LastViewPager())
+            }
             return data
         }
 
@@ -41,7 +46,8 @@ class NestedParentRecyclerViewActivity : AppCompatActivity() {
         val adapter = MultiTypeAdapter(data)
         adapter.register(BannerItem())
         adapter.register(NormalItem())
-        adapter.register(LastItem(recyclerView))
+        adapter.register(LastViewPager2Item(recyclerView))
+        adapter.register(LastViewPagerItem(recyclerView))
         recyclerView.adapter = adapter
 
         swipeRefreshLayout.setOnRefreshListener {

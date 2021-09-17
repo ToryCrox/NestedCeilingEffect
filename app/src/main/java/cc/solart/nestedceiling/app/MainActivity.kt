@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import cc.solart.nestedceiling.app.page.NestedParentRecyclerViewActivity
-import cc.solart.nestedceiling.app.page.NestedParentScrollViewActivity
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -14,12 +13,14 @@ class MainActivity : AppCompatActivity() {
         val btn1: Button = findViewById(R.id.btn1)
         val btn2: Button = findViewById(R.id.btn2)
         btn1.setOnClickListener {
-            val intent = Intent(this, NestedParentScrollViewActivity::class.java)
+            val intent = Intent(this, NestedParentRecyclerViewActivity::class.java)
+            intent.putExtra("isViewPager2", false)
             startActivity(intent)
         }
 
         btn2.setOnClickListener {
             val intent = Intent(this, NestedParentRecyclerViewActivity::class.java)
+            intent.putExtra("isViewPager2", true)
             startActivity(intent)
         }
     }

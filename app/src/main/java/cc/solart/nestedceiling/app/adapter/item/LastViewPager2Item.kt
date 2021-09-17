@@ -6,10 +6,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import cc.solart.nestedceiling.app.R
-import cc.solart.nestedceiling.app.adapter.ViewPagerAdapter
-import cc.solart.nestedceiling.app.model.Last
+import cc.solart.nestedceiling.app.model.LastViewPager2
 import cc.solart.nestedceiling.app.page.LinearINormalFragment
 import cc.solart.nestedceiling.app.page.StaggeredFragment
 import cc.solart.nestedceiling.widget.NestedParentRecyclerView
@@ -20,12 +20,13 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.google.android.material.tabs.TabLayoutMediator.TabConfigurationStrategy
 import java.util.*
 
-class LastItem(private val recyclerView: NestedParentRecyclerView) : ItemViewBinder<Last, LastItem.ViewHolder>() {
+class LastViewPager2Item(private val recyclerView: NestedParentRecyclerView) : ItemViewBinder<LastViewPager2, LastViewPager2Item.ViewHolder>() {
 
     class ViewHolder(itemView: View, recyclerView: NestedParentRecyclerView) : RecyclerView.ViewHolder(itemView) {
 
         init {
             val viewPager: ViewPager2 = itemView.findViewById(R.id.view_pager)
+            viewPager.offscreenPageLimit = 2
             val tabLayout: TabLayout = itemView.findViewById(R.id.tab_layout)
 
             val pagerAdapter = ViewPagerAdapter(itemView.context as FragmentActivity, getPageFragments())
@@ -54,12 +55,36 @@ class LastItem(private val recyclerView: NestedParentRecyclerView) : ItemViewBin
         }
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, item: Last) {
+    override fun onBindViewHolder(holder: ViewHolder, item: LastViewPager2) {
 
     }
 
     override fun onCreateViewHolder(inflater: LayoutInflater, parent: ViewGroup): ViewHolder {
-        return ViewHolder(inflater.inflate(R.layout.item_last, parent, false), recyclerView)
+        return ViewHolder(inflater.inflate(R.layout.item_last_view_pager2, parent, false).apply {
+             setTag(R.id.nested_child_item_container, true)
+        }, recyclerView)
+    }
+
+    class ViewPagerAdapter(fragmentActivity: FragmentActivity, private val data: List<Fragment>) : FragmentStateAdapter(fragmentActivity) {
+        override fun createFragment(position: Int): Fragment {
+            return data[position]
+        }
+
+        override fun getItemCount(): Int {
+            return data.size
+        }
+
+        fun notifyChildToTop() {
+            for (i in data.indices){
+                val fragment = data[i]
+                if(fragment is LinearINormalFragment){
+                    fragment.resetToTop()
+                } else if(fragment is StaggeredFragment) {
+                    fragment.resetToTop()
+                }
+            }
+        }
+
     }
 
 }
