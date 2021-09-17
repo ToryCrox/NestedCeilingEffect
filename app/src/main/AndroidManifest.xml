@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="cc.solart.nestedceiling.app">
+    package="com.tory.nestedceiling.app">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -11,14 +11,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme" >
 
-        <activity android:name=".MainActivity">
+        <activity android:name="com.tory.nestedceiling.app.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".page.NestedParentRecyclerViewActivity" />
+        <activity android:name="com.tory.nestedceiling.app.page.NestedParentRecyclerViewActivity" />
 
     </application>
 </manifest>

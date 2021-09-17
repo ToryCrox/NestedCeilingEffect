@@ -13,12 +13,12 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <cc.solart.nestedceiling.widget.NestedParentRecyclerView
+        <com.tory.nestedceiling.widget.NestedParentRecyclerView
             android:id="@+id/nested_rv"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-        </cc.solart.nestedceiling.widget.NestedParentRecyclerView>
+        </com.tory.nestedceiling.widget.NestedParentRecyclerView>
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
