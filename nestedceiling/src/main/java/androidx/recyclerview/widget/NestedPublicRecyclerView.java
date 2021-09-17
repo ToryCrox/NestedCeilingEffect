@@ -2,6 +2,7 @@ package androidx.recyclerview.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.widget.OverScroller;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -34,5 +35,18 @@ public class NestedPublicRecyclerView extends RecyclerView {
 
     public void scrollConsumed(int dx, int dy, @Nullable int[] consumed) {
         scrollStep(dx, dy, consumed);
+    }
+
+    @Nullable
+    public OverScroller getFlingOverScroll() {
+        return mViewFlinger.mOverScroller;
+    }
+
+    /**
+     * 是否使用自带的Fling
+     * @return
+     */
+    public boolean enableOverScrollFling() {
+        return getFlingOverScroll() != null;
     }
 }
