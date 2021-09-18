@@ -50,6 +50,8 @@ class NestedParentRecyclerViewActivity : AppCompatActivity() {
         adapter.register(LastViewPagerItem(recyclerView))
         recyclerView.adapter = adapter
 
+        recyclerView.topOffset = 150
+
         swipeRefreshLayout.setOnRefreshListener {
             swipeRefreshLayout.postDelayed({ swipeRefreshLayout.isRefreshing = false }, 1000)
         }

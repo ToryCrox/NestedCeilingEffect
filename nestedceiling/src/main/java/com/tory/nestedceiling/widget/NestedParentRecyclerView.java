@@ -21,15 +21,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 import com.tory.nestedceiling.R;
-import com.tory.nestedceiling.utils.FindTarget;
-import com.tory.nestedceiling.utils.FlingHelper;
 
 /**
  * 嵌套滑动的父View
  */
 public class NestedParentRecyclerView extends NestedPublicRecyclerView implements NestedScrollingParent3, NestedScrollingParent2 {
     public final static String TAG = "NestedParentRecycler";
-    public final static boolean DEBUG = false;
+    public final static boolean DEBUG = true;
 
     private NestedScrollingParentHelper mParentHelper;
     private FlingHelper mFlingHelper;
@@ -47,6 +45,8 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
 
     private final int[] mTempConsumed = new int[2];
     private final int[] mNestedScrollingV2ConsumedCompat = new int[2];
+
+    private int mTopOffset = 0;
 
     public NestedParentRecyclerView(@NonNull Context context) {
         this(context, null);
@@ -67,11 +67,23 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
         setOverScrollMode(OVER_SCROLL_NEVER);
     }
 
+    public int getTopOffset() {
+        return mTopOffset;
+    }
+
+    /**
+     * 距离嵌套滑动距离顶部应该流出的空间
+     * @param topOffset
+     */
+    public void setTopOffset(int topOffset) {
+        this.mTopOffset = topOffset;
+        requestLayout();
+    }
+
 
     public void addOnChildAttachStateListener(OnChildAttachStateListener listener) {
         mOnChildAttachStateListeners.add(listener);
     }
-
 
     protected boolean isTargetContainer(View child) {
         return child instanceof NestedChildItemContainer
@@ -82,8 +94,20 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
     public void onChildAttachedToWindow(@NonNull View child) {
         if (isTargetContainer(child)) {
             mContentView = (ViewGroup) child;
+            ViewGroup.LayoutParams lp = child.getLayoutParams();
+            if (lp == null) {
+                lp = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT);
+            }
+            if (lp.height == ViewGroup.LayoutParams.WRAP_CONTENT) {
+                lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
+            }
+            if (lp.width == ViewGroup.LayoutParams.WRAP_CONTENT) {
+                lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
+            }
+            child.setLayoutParams(lp);
             if (DEBUG) {
-                Log.d(TAG, "onChildAttachedToWindow....");
+                log("onChildAttachedToWindow....");
             }
         }
     }
@@ -92,7 +116,7 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
     public void onChildDetachedFromWindow(@NonNull View child) {
         if (child == mContentView) {
             mContentView = null;
-            Log.d(TAG, "onChildDetachedFromWindow....");
+            log("onChildDetachedFromWindow....");
         }
     }
 
@@ -134,7 +158,7 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
             case MotionEvent.ACTION_MOVE:
                 final int activePointerIndex = e.findPointerIndex(mActivePointerId);
                 if (activePointerIndex == -1) {
-                    Log.d(TAG, "Invalid pointerId=" + mActivePointerId + " in onTouchEvent");
+                    log("Invalid pointerId=" + mActivePointerId + " in onTouchEvent");
                     break;
                 }
                 final float y = e.getY(activePointerIndex);
@@ -245,7 +269,7 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
     public boolean onStartNestedScroll(@NonNull View child, @NonNull View target, int axes, int type) {
         boolean isStart = (axes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0;
         if (DEBUG) {
-            Log.d(TAG, "onStartNestedScroll type: " + type + ", scrollState: " + getScrollState());
+            log("onStartNestedScroll type: " + type + ", scrollState: " + getScrollState());
         }
         if (isStart && type == ViewCompat.TYPE_TOUCH && getScrollState() == SCROLL_STATE_SETTLING) {
             // 子view引起嵌套滑动是可能在fling，stop it
@@ -291,7 +315,7 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
             scrollConsumed(0, dy, mTempConsumed);
             consumed[1] = mTempConsumed[1];
             if (DEBUG) {
-                Log.d(TAG, "onNestedPreScroll dy:" + dy + ", consumedY: " + consumed[1] + ", type:" + type);
+                log("onNestedPreScroll dy:" + dy + ", consumedY: " + consumed[1] + ", type:" + type);
             }
         }
     }
@@ -314,6 +338,13 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
         onNestedScrollInternal(target, dyUnconsumed, type, consumed);
     }
 
+    /**
+     * dyUnconsumed != 0时，嵌套的子view，表示嵌套的子view不能滑动，也就是到顶了，大于0表示下滑，小于0表示上划
+     * @param target
+     * @param dyUnconsumed
+     * @param type
+     * @param consumed
+     */
     private void onNestedScrollInternal(@NonNull View target, int dyUnconsumed, int type, @NonNull int[] consumed) {
         if (dyUnconsumed == 0) {
             return;
@@ -327,24 +358,29 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
         dispatchNestedScroll(0, consumedY, 0, myUnconsumedY, null, type, consumed);
 
         if (DEBUG) {
-            Log.d(TAG, "onNestedScrollInternal dyUnconsumed:" + dyUnconsumed
+            log("onNestedScrollInternal dyUnconsumed:" + dyUnconsumed
                     + ", consumedY:" + consumedY + ", myUnconsumedY:" + myUnconsumedY
                     + ", type:" + type);
         }
 
-        if (type == ViewCompat.TYPE_NON_TOUCH && target instanceof NestedChildRecyclerView) {
+        // dyUnconsumed 大于0是下滑，小于0是上划
+        if (dyUnconsumed < 0 && type == ViewCompat.TYPE_NON_TOUCH && target instanceof NestedChildRecyclerView) {
             NestedChildRecyclerView nestedView = (NestedChildRecyclerView) target;
+            if (nestedView != FindTarget.findChildScrollTarget(mContentView)) {
+                log("onNestedScrollInternal nestedView is changed, return");
+                return;
+            }
             OverScroller overScroller = nestedView.getFlingOverScroll();
             if (overScroller == null) {
                 return;
             }
             float absVelocity = overScroller.getCurrVelocity();
             nestedView.stopScroll();
-            float myVelocity = absVelocity * (dyUnconsumed > 0 ? 1 : -1);
+            float myVelocity = absVelocity * -1;
             fling(0, Math.round(myVelocity));
 
             if (DEBUG) {
-                Log.d(TAG, "onNestedScrollInternal start fling from child, absVelocity:" + absVelocity + ", myVelocity:" + myVelocity);
+                log("onNestedScrollInternal start fling from child, absVelocity:" + absVelocity + ", myVelocity:" + myVelocity);
             }
         }
     }
@@ -353,7 +389,7 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
     @Override
     public void onStopNestedScroll(@NonNull View target, int type) {
         if (DEBUG) {
-            Log.d(TAG, "onStopNestedScroll type: " + type + ", scrollState: " + getScrollState());
+            log("onStopNestedScroll type: " + type + ", scrollState: " + getScrollState());
         }
         if (type == ViewCompat.TYPE_TOUCH && getScrollState() == SCROLL_STATE_SETTLING) {
             // 停止是可能正在fling，需要手动停止
@@ -373,7 +409,7 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
     @Override
     public boolean onNestedFling(
             @NonNull View target, float velocityX, float velocityY, boolean consumed) {
-        Log.d(TAG, "onNestedFling velocityY: " + velocityY + ", consumed: " + consumed);
+        log("onNestedFling velocityY: " + velocityY + ", consumed: " + consumed);
         if (!consumed) {
             dispatchNestedFling(0, velocityY, true);
             fling(0, (int) velocityY);
@@ -390,5 +426,9 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
     @Override
     public int getNestedScrollAxes() {
         return mParentHelper.getNestedScrollAxes();
+    }
+
+    private void log(String msg) {
+        Log.d(TAG, msg);
     }
 }

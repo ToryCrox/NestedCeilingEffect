@@ -7,8 +7,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.NestedPublicRecyclerView;
 
-import com.tory.nestedceiling.utils.FlingHelper;
-
 /**
  * 嵌套滑动子View，一定要继承该View
  */
@@ -27,4 +25,8 @@ public class NestedChildRecyclerView extends NestedPublicRecyclerView implements
         setNestedScrollingEnabled(true);
     }
 
+    @Override
+    protected void onMeasure(int widthSpec, int heightSpec) {
+        super.onMeasure(widthSpec, heightSpec);
+    }
 }

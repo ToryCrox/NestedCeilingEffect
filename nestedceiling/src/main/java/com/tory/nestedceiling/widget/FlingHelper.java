@@ -1,4 +1,4 @@
-package com.tory.nestedceiling.utils;
+package com.tory.nestedceiling.widget;
 
 import android.content.Context;
 import android.view.ViewConfiguration;

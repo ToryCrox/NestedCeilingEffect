@@ -12,12 +12,11 @@ import com.tory.nestedceiling.app.R
 import com.tory.nestedceiling.app.model.LastViewPager2
 import com.tory.nestedceiling.app.page.LinearINormalFragment
 import com.tory.nestedceiling.app.page.StaggeredFragment
-import com.tory.nestedceiling.widget.NestedParentRecyclerView
-import com.tory.nestedceiling.widget.OnChildAttachStateListener
 import com.drakeet.multitype.ItemViewBinder
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.android.material.tabs.TabLayoutMediator.TabConfigurationStrategy
+import com.tory.nestedceiling.widget.*
 import java.util.*
 
 class LastViewPager2Item(private val recyclerView: NestedParentRecyclerView) : ItemViewBinder<LastViewPager2, LastViewPager2Item.ViewHolder>() {
@@ -61,7 +60,7 @@ class LastViewPager2Item(private val recyclerView: NestedParentRecyclerView) : I
 
     override fun onCreateViewHolder(inflater: LayoutInflater, parent: ViewGroup): ViewHolder {
         return ViewHolder(inflater.inflate(R.layout.item_last_view_pager2, parent, false).apply {
-             setTag(R.id.nested_child_item_container, true)
+             NestedCeilingHelper.setNestedChildContainerTag(this)
         }, recyclerView)
     }
 

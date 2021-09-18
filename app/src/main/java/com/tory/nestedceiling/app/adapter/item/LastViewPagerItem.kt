@@ -1,8 +1,11 @@
 package com.tory.nestedceiling.app.adapter.item
 
+import android.content.Context
+import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.fragment.app.*
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
@@ -10,10 +13,9 @@ import androidx.viewpager.widget.ViewPager
 import com.tory.nestedceiling.app.R
 import com.tory.nestedceiling.app.model.LastViewPager
 import com.tory.nestedceiling.app.page.*
-import com.tory.nestedceiling.widget.NestedParentRecyclerView
-import com.tory.nestedceiling.widget.OnChildAttachStateListener
 import com.drakeet.multitype.ItemViewBinder
 import com.google.android.material.tabs.TabLayout
+import com.tory.nestedceiling.widget.*
 import java.util.*
 
 class LastViewPagerItem(private val recyclerView: NestedParentRecyclerView) : ItemViewBinder<LastViewPager, LastViewPagerItem.ViewHolder>() {
@@ -55,9 +57,10 @@ class LastViewPagerItem(private val recyclerView: NestedParentRecyclerView) : It
     }
 
     override fun onCreateViewHolder(inflater: LayoutInflater, parent: ViewGroup): ViewHolder {
-        return ViewHolder(inflater.inflate(R.layout.item_last_view_pager, parent, false).apply {
-             setTag(R.id.nested_child_item_container, true)
-        }, recyclerView)
+        val item = inflater.inflate(R.layout.item_last_view_pager, parent, false)
+        val container = NestedContainer(parent.context)
+        container.addView(item, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        return ViewHolder(container, recyclerView)
     }
 
     private class ViewPagerAdapter(fragmentActivity: FragmentActivity,
@@ -72,6 +75,16 @@ class LastViewPagerItem(private val recyclerView: NestedParentRecyclerView) : It
         override fun getCount(): Int = data.size
 
         override fun getItem(position: Int): Fragment = data[position]
+    }
+
+
+    class NestedContainer @JvmOverloads constructor(
+        context: Context, attrs: AttributeSet? = null
+    ) : FrameLayout(context, attrs), NestedChildItemContainer {
+
+        override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+            super.onMeasure(widthMeasureSpec, NestedCeilingHelper.wrapContainerMeasureHeight(this, heightMeasureSpec))
+        }
     }
 
 }
