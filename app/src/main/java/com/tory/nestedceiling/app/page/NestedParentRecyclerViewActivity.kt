@@ -12,6 +12,8 @@ import com.tory.nestedceiling.app.model.*
 import com.tory.nestedceiling.widget.NestedParentRecyclerView
 import com.tory.nestedceiling.widget.OnChildAttachStateListener
 import com.drakeet.multitype.MultiTypeAdapter
+import com.tory.module_adapter.base.NormalModuleAdapter
+import com.tory.nestedceiling.app.views.*
 import java.util.*
 
 class NestedParentRecyclerViewActivity : AppCompatActivity() {
@@ -20,37 +22,31 @@ class NestedParentRecyclerViewActivity : AppCompatActivity() {
     private val isViewPager2: Boolean
         get() = intent?.getBooleanExtra("isViewPager2", false) == true
 
-    private val data: List<Any>
-        get() {
-            val data: MutableList<Any> = ArrayList()
-            data.add(BannerData())
-            data.add(R.drawable.drawable_icons)
-            data.add(R.drawable.drawable_new)
-            data.add(R.drawable.drawable_recommend)
-            if (isViewPager2) {
-                data.add(LastViewPager2())
-            } else {
-                data.add(LastViewPager())
-            }
-            return data
-        }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_nestedrecyclerview)
 
+        val listAdapter = NormalModuleAdapter()
+        listAdapter.register {
+            ModuleBannerView(it.context)
+        }
+        listAdapter.register {
+            ModuleNormalItemView(it.context)
+        }
+        listAdapter.register {
+            LastViewPagerItemView(it.context)
+        }
+        listAdapter.register {
+            LastViewPager2ItemView(it.context)
+        }
+
+
+
         val swipeRefreshLayout = findViewById<SwipeRefreshLayout>(R.id.swipe_refresh_layout)
         val recyclerView = findViewById<NestedParentRecyclerView>(R.id.nested_rv)
         val topAnchor = findViewById<ImageView>(R.id.top_anchor)
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        val adapter = MultiTypeAdapter(data)
-        adapter.register(BannerItem())
-        adapter.register(NormalItem())
-        adapter.register(LastViewPager2Item(recyclerView))
-        adapter.register(LastViewPagerItem(recyclerView))
-        recyclerView.adapter = adapter
-
-        recyclerView.topOffset = 150
+        recyclerView.layoutManager = listAdapter.getGridLayoutManager(this)
+        recyclerView.adapter = listAdapter
 
         swipeRefreshLayout.setOnRefreshListener {
             swipeRefreshLayout.postDelayed({ swipeRefreshLayout.isRefreshing = false }, 1000)
@@ -58,6 +54,19 @@ class NestedParentRecyclerViewActivity : AppCompatActivity() {
         topAnchor.setOnClickListener {
             recyclerView.smoothScrollToPosition(0)
         }
+
+
+        val data: MutableList<Any> = ArrayList()
+        data.add(ModuleBannerModel())
+        data.add(ModuleNormalItemModel(R.drawable.drawable_icons))
+        data.add(ModuleNormalItemModel(R.drawable.drawable_new))
+        data.add(ModuleNormalItemModel(R.drawable.drawable_recommend))
+        if (isViewPager2) {
+            data.add(LastViewPager2Model())
+        } else {
+            data.add(LastViewPagerModel())
+        }
+        listAdapter.setItems(data)
 
         recyclerView.addOnChildAttachStateListener(object :OnChildAttachStateListener{
             override fun onChildDetachedFromTop() {

@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import com.tory.module_adapter.base.NormalModuleAdapter
 import com.tory.nestedceiling.app.page.NestedParentRecyclerViewActivity
 
 class MainActivity : AppCompatActivity() {
@@ -23,5 +24,6 @@ class MainActivity : AppCompatActivity() {
             intent.putExtra("isViewPager2", true)
             startActivity(intent)
         }
+        NormalModuleAdapter
     }
 }
