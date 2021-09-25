@@ -49,4 +49,12 @@ public class NestedPublicRecyclerView extends RecyclerView {
     public boolean enableOverScrollFling() {
         return getFlingOverScroll() != null;
     }
+
+    /**
+     * 更新滚动状态
+     * @param scrollState
+     */
+    public void updateScrollState(int scrollState) {
+        setScrollState(scrollState);
+    }
 }

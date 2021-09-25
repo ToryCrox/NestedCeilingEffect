@@ -15,6 +15,9 @@ import com.tory.nestedceiling.R;
  * - Description:
  */
 public class NestedCeilingHelper {
+
+    public static boolean DEBUG = true;
+
     /**
      * 将标记为
      * @param view

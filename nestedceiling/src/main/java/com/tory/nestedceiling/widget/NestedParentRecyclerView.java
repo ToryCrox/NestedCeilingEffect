@@ -106,7 +106,7 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
                 lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
             }
             child.setLayoutParams(lp);
-            if (DEBUG) {
+            if (NestedCeilingHelper.DEBUG) {
                 log("onChildAttachedToWindow....");
             }
         }
@@ -168,7 +168,12 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
                     NestedChildRecyclerView child = FindTarget.findChildScrollTarget(mContentView);
                     if (child != null) {
                         int deltaY = (int) (mLastY - y);
-                        child.scrollConsumed(0, deltaY, null);
+                        mTempConsumed[1] = 0;
+                        child.scrollConsumed(0, deltaY, mTempConsumed);
+                        int consumedY = mTempConsumed[1];
+                        if (consumedY != 0 && NestedCeilingHelper.DEBUG) {
+                            log("onTouch scroll consumed: " + consumedY);
+                        }
                     }
                 }
                 mLastY = y;
@@ -268,7 +273,7 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
     @Override
     public boolean onStartNestedScroll(@NonNull View child, @NonNull View target, int axes, int type) {
         boolean isStart = (axes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0;
-        if (DEBUG) {
+        if (NestedCeilingHelper.DEBUG) {
             log("onStartNestedScroll type: " + type + ", scrollState: " + getScrollState());
         }
         if (isStart && type == ViewCompat.TYPE_TOUCH && getScrollState() == SCROLL_STATE_SETTLING) {
@@ -314,7 +319,10 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
             mTempConsumed[1] = 0;
             scrollConsumed(0, dy, mTempConsumed);
             consumed[1] = mTempConsumed[1];
-            if (DEBUG) {
+
+            updateScrollState(type == ViewCompat.TYPE_TOUCH ? SCROLL_STATE_DRAGGING : SCROLL_STATE_SETTLING);
+
+            if (NestedCeilingHelper.DEBUG) {
                 log("onNestedPreScroll dy:" + dy + ", consumedY: " + consumed[1] + ", type:" + type);
             }
         }
@@ -357,10 +365,14 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
 
         dispatchNestedScroll(0, consumedY, 0, myUnconsumedY, null, type, consumed);
 
-        if (DEBUG) {
+        if (NestedCeilingHelper.DEBUG) {
             log("onNestedScrollInternal dyUnconsumed:" + dyUnconsumed
                     + ", consumedY:" + consumedY + ", myUnconsumedY:" + myUnconsumedY
                     + ", type:" + type);
+        }
+
+        if (dyUnconsumed < 0 && type == ViewCompat.TYPE_TOUCH) {
+            updateScrollState(SCROLL_STATE_DRAGGING);
         }
 
         // dyUnconsumed 大于0是下滑，小于0是上划
@@ -379,7 +391,7 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
             float myVelocity = absVelocity * -1;
             fling(0, Math.round(myVelocity));
 
-            if (DEBUG) {
+            if (NestedCeilingHelper.DEBUG) {
                 log("onNestedScrollInternal start fling from child, absVelocity:" + absVelocity + ", myVelocity:" + myVelocity);
             }
         }
@@ -388,12 +400,19 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
 
     @Override
     public void onStopNestedScroll(@NonNull View target, int type) {
-        if (DEBUG) {
+        if (NestedCeilingHelper.DEBUG) {
             log("onStopNestedScroll type: " + type + ", scrollState: " + getScrollState());
         }
         if (type == ViewCompat.TYPE_TOUCH && getScrollState() == SCROLL_STATE_SETTLING) {
             // 停止是可能正在fling，需要手动停止
+            log("onStopNestedScroll stop it");
             stopScroll();
+        } else if (getFlingOverScroll() != null && getFlingOverScroll().isFinished()
+                && target instanceof NestedChildRecyclerView
+                && ((NestedChildRecyclerView) target).getScrollState() == SCROLL_STATE_IDLE){
+            // 嵌套滑动停止时要将状态至为idle状态
+            //((NestedChildRecyclerView) target).getScrollState() ==
+            updateScrollState(SCROLL_STATE_IDLE);
         }
         mParentHelper.onStopNestedScroll(target, type);
         stopNestedScroll(type);
