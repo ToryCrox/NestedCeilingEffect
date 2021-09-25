@@ -48,6 +48,8 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
 
     private int mTopOffset = 0;
 
+    private boolean mIsChildNestedScrolling = false;
+
     public NestedParentRecyclerView(@NonNull Context context) {
         this(context, null);
     }
@@ -237,18 +239,35 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
     public void onScrollStateChanged(int state) {
         if (state == SCROLL_STATE_IDLE) {
             dispatchChildFling();
+        } else {
+            dispatchChildState(state);
+        }
+    }
+
+    private void dispatchChildState(int state) {
+        if (mIsChildNestedScrolling) {
+            return;
+        }
+        NestedChildRecyclerView child = FindTarget.findChildScrollTarget(mContentView);
+        if (child != null) {
+            child.updateScrollState(state);
         }
     }
 
     private void dispatchChildFling() {
-        if (mVelocityY != 0) {
+        boolean isChildFling = false;
+        if (mVelocityY != 0 && isScrollEnd()) {
             double splineFlingDistance = mFlingHelper.getSplineFlingDistance(mVelocityY);
             if (splineFlingDistance > mTotalDy) {
                 childFling(mFlingHelper.getVelocityByDistance(splineFlingDistance - mTotalDy));
+                isChildFling = true;
             }
         }
         mTotalDy = 0;
         mVelocityY = 0;
+        if (!isChildFling) {
+            dispatchChildState(SCROLL_STATE_IDLE);
+        }
     }
 
     private void childFling(int velocityY) {
@@ -279,6 +298,9 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
         if (isStart && type == ViewCompat.TYPE_TOUCH && getScrollState() == SCROLL_STATE_SETTLING) {
             // 子view引起嵌套滑动是可能在fling，stop it
             stopScroll();
+        }
+        if (isStart) {
+            mIsChildNestedScrolling = true;
         }
         return isStart;
     }
@@ -416,6 +438,7 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
         }
         mParentHelper.onStopNestedScroll(target, type);
         stopNestedScroll(type);
+        mIsChildNestedScrolling = false;
     }
     // NestedScrollingParent
 
