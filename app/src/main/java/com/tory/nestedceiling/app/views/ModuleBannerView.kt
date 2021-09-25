@@ -4,15 +4,13 @@ import android.content.Context
 import android.util.AttributeSet
 import com.tory.module_adapter.views.AbsModuleView
 import com.tory.nestedceiling.app.adapter.BannerImageAdapter
+import com.tory.nestedceiling.app.utils.MaterialColor
 import com.tory.nestedceiling.app.utils.dp
 import com.youth.banner.Banner
 import com.youth.banner.indicator.RectangleIndicator
 
 data class ModuleBannerModel(
-    val list: List<String> = listOf("https://hellorfimg.zcool.cn/provider_image/large/2238406784.jpg",
-        "https://hellorfimg.zcool.cn/provider_image/large/2238407550.jpg",
-        "https://hellorfimg.zcool.cn/provider_image/large/2238400920.jpg",
-        "https://hellorfimg.zcool.cn/provider_image/large/2238389071.jpg")
+    val list: List<MaterialColor> = MaterialColor.values().take(5)
 )
 
 
@@ -21,7 +19,7 @@ class ModuleBannerView @JvmOverloads constructor(
 ) : AbsModuleView<ModuleBannerModel>(context, attrs) {
 
 
-    val banner = Banner<String, BannerImageAdapter>(context)
+    val banner = Banner<MaterialColor, BannerImageAdapter>(context)
     val bannerAdapter = BannerImageAdapter(emptyList())
 
     init {

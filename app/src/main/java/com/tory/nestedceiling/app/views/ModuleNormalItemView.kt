@@ -4,9 +4,11 @@ import android.content.Context
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatImageView
 import com.tory.module_adapter.views.AbsModuleView
+import com.tory.nestedceiling.app.utils.MaterialColor
+import com.tory.nestedceiling.app.utils.dp
 
 data class ModuleNormalItemModel(
-    val resId: Int
+    val color: MaterialColor
 )
 
 
@@ -14,18 +16,13 @@ class ModuleNormalItemView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
 ) : AbsModuleView<ModuleNormalItemModel>(context, attrs) {
 
-
-    val imageView = AppCompatImageView(context)
-
     init {
-        addView(imageView, LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-        imageView.adjustViewBounds = true
+        layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, 100.dp())
     }
 
     override fun onChanged(model: ModuleNormalItemModel) {
         super.onChanged(model)
-        imageView.setImageResource(model.resId)
+        setBackgroundColor(model.color.color)
     }
-
 
 }
