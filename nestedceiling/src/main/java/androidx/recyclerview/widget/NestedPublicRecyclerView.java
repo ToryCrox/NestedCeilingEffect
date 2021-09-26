@@ -57,4 +57,15 @@ public class NestedPublicRecyclerView extends RecyclerView {
     public void updateScrollState(int scrollState) {
         setScrollState(scrollState);
     }
+
+    /**
+     * 停止滚动，但不更新状态
+     */
+    public void stopScrollWithoutState() {
+        mViewFlinger.stop();
+        LayoutManager layout = getLayoutManager();
+        if (layout != null) {
+            layout.stopSmoothScroller();
+        }
+    }
 }

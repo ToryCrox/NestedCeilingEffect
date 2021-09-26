@@ -9,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.tory.nestedceiling.app.R
-import com.tory.nestedceiling.app.adapter.item.*
 import com.tory.nestedceiling.app.model.*
 import com.tory.nestedceiling.widget.NestedParentRecyclerView
 import com.tory.nestedceiling.widget.OnChildAttachStateListener

@@ -409,7 +409,9 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
                 return;
             }
             float absVelocity = overScroller.getCurrVelocity();
-            nestedView.stopScroll();
+            // nestedView.stopScroll();
+            // 停止，但不更新状态，因为fling时在onStateChanged中要更新子view的状态
+            nestedView.stopScrollWithoutState();
             float myVelocity = absVelocity * -1;
             fling(0, Math.round(myVelocity));
 
