@@ -2,10 +2,13 @@ package androidx.recyclerview.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.OverScroller;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.tory.nestedceiling.widget.NestedCeilingHelper;
 
 /**
  * - Author: xutao
@@ -33,13 +36,30 @@ public class NestedPublicRecyclerView extends RecyclerView {
         super.scrollStep(dx, dy, consumed);
     }
 
-    public void scrollConsumed(int dx, int dy, @Nullable int[] consumed) {
+    public void doScrollConsumed(int dx, int dy, @NonNull int[] consumed) {
+        consumed[0] = 0;
+        consumed[1] = 1;
         scrollStep(dx, dy, consumed);
+        int consumedX = consumed[0];
+        int consumedY = consumed[1];
+        if (consumedX != 0 || consumedY != 0) {
+            // 分发滚动状态
+            dispatchOnScrolled(consumedX, consumedY);
+        }
     }
 
     @Nullable
     public OverScroller getFlingOverScroll() {
         return mViewFlinger.mOverScroller;
+    }
+
+    /**
+     * 是否正在Fling
+     * @return
+     */
+    public boolean isFling() {
+        OverScroller overScroller = getFlingOverScroll();
+        return overScroller != null && !overScroller.isFinished();
     }
 
     /**
@@ -67,5 +87,28 @@ public class NestedPublicRecyclerView extends RecyclerView {
         if (layout != null) {
             layout.stopSmoothScroller();
         }
+    }
+
+    /**
+     * Fling到边缘时回调
+     * @param velocityX
+     * @param velocityY
+     */
+    @Override
+    void absorbGlows(int velocityX, int velocityY) {
+        //super.absorbGlows(velocityX, velocityY);
+        if (NestedCeilingHelper.DEBUG) {
+            Log.d("NestedPublicRecycler", "absorbGlows velocityY:" + velocityY);
+        }
+        onFlingEnd(velocityX, velocityY);
+    }
+
+    /**
+     * Fling到边缘时回调
+     * @param velocityX
+     * @param velocityY
+     */
+    protected void onFlingEnd(int velocityX, int velocityY) {
+
     }
 }

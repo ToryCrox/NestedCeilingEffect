@@ -15,17 +15,38 @@ import com.tory.nestedceiling.R;
  * - Description:
  */
 public class NestedCeilingHelper {
+    /**
+     * Log开关
+     */
+    public static boolean DEBUG = false;
 
-    public static boolean DEBUG = true;
+    // 使用自带的overScroll来传递fling事件
+    public static final boolean USE_OVER_SCROLL = true;
 
     /**
      * 将标记为
      * @param view
      */
     public static void setNestedChildContainerTag(@NonNull View view) {
-        view.setTag(R.id.nested_child_item_container, true);
+        view.setTag(R.id.nested_child_item_container, Boolean.TRUE);
     }
 
+    /**
+     * 判断是否是包裹类
+     * @param view
+     * @return
+     */
+    public static boolean isNestedChildContainerTag(@NonNull View view) {
+        return view.getTag(R.id.nested_child_item_container) == Boolean.TRUE
+                || view instanceof NestedChildItemContainer;
+    }
+
+    /**
+     * 重写高度
+     * @param view
+     * @param heightSpec
+     * @return
+     */
     public static int wrapContainerMeasureHeight(@NonNull View view, int heightSpec) {
         ViewParent parent = view.getParent();
         if (!(parent instanceof NestedParentRecyclerView)) {

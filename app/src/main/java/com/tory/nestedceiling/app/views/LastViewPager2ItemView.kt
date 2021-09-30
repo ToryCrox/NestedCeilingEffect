@@ -22,6 +22,8 @@ class LastViewPager2ItemView @JvmOverloads constructor(
     val tabLayout = findViewById<TabLayout>(R.id.tab_layout)
     val viewPager = findViewById<ViewPager2>(R.id.view_pager)
 
+    val activity: AppCompatActivity = context as AppCompatActivity
+
     init {
         layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
         NestedCeilingHelper.setNestedChildContainerTag(this)

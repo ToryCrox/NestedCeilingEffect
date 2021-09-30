@@ -27,7 +27,6 @@ import com.tory.nestedceiling.R;
  */
 public class NestedParentRecyclerView extends NestedPublicRecyclerView implements NestedScrollingParent3, NestedScrollingParent2 {
     public final static String TAG = "NestedParentRecycler";
-    public final static boolean DEBUG = true;
 
     private NestedScrollingParentHelper mParentHelper;
     private FlingHelper mFlingHelper;
@@ -66,7 +65,15 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
     private void setup() {
         mParentHelper = new NestedScrollingParentHelper(this);
         mFlingHelper = new FlingHelper(getContext());
-        setOverScrollMode(OVER_SCROLL_NEVER);
+        setOverScrollMode(OVER_SCROLL_ALWAYS);
+    }
+
+    @Override
+    public void setOverScrollMode(int overScrollMode) {
+        if (overScrollMode == OVER_SCROLL_NEVER) {
+            throw new IllegalArgumentException("NestedChildRecyclerView must be OVER_SCROLL_ALWAYS!!");
+        }
+        super.setOverScrollMode(overScrollMode);
     }
 
     public int getTopOffset() {
@@ -79,7 +86,9 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
      */
     public void setTopOffset(int topOffset) {
         this.mTopOffset = topOffset;
-        requestLayout();
+        if (mContentView != null){
+            mContentView.requestLayout();
+        }
     }
 
 
@@ -88,8 +97,7 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
     }
 
     protected boolean isTargetContainer(View child) {
-        return child instanceof NestedChildItemContainer
-                || child.getTag(R.id.nested_child_item_container) != null;
+        return NestedCeilingHelper.isNestedChildContainerTag(child);
     }
 
     @Override
@@ -171,7 +179,7 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
                     if (child != null) {
                         int deltaY = (int) (mLastY - y);
                         mTempConsumed[1] = 0;
-                        child.scrollConsumed(0, deltaY, mTempConsumed);
+                        child.doScrollConsumed(0, deltaY, mTempConsumed);
                         int consumedY = mTempConsumed[1];
                         if (consumedY != 0 && NestedCeilingHelper.DEBUG) {
                             log("onTouch scroll consumed: " + consumedY);
@@ -238,9 +246,28 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
     @Override
     public void onScrollStateChanged(int state) {
         if (state == SCROLL_STATE_IDLE) {
-            dispatchChildFling();
+            if (NestedCeilingHelper.USE_OVER_SCROLL) {
+                dispatchChildState(SCROLL_STATE_IDLE);
+            } else {
+                dispatchChildFling();
+            }
         } else {
             dispatchChildState(state);
+        }
+    }
+
+    @Override
+    protected void onFlingEnd(int velocityX, int velocityY) {
+        super.onFlingEnd(velocityX, velocityY);
+        if (velocityY > 0 && NestedCeilingHelper.USE_OVER_SCROLL) {
+            // 通过OverScroll传递滚动状态
+            RecyclerView child = FindTarget.findChildScrollTarget(mContentView);
+            if (child != null) {
+                if (NestedCeilingHelper.DEBUG) {
+                    log("onFlingEnd fling child velocityY: " + velocityY);
+                }
+                child.fling(0, velocityY);
+            }
         }
     }
 
@@ -249,7 +276,7 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
             return;
         }
         NestedChildRecyclerView child = FindTarget.findChildScrollTarget(mContentView);
-        if (child != null) {
+        if (child != null && !child.isFling()) {
             child.updateScrollState(state);
         }
     }
@@ -339,7 +366,7 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
         boolean needKeepScroll = dy > 0 && !isScrollEnd();
         if (needKeepScroll) {
             mTempConsumed[1] = 0;
-            scrollConsumed(0, dy, mTempConsumed);
+            doScrollConsumed(0, dy, mTempConsumed);
             consumed[1] = mTempConsumed[1];
 
             updateScrollState(type == ViewCompat.TYPE_TOUCH ? SCROLL_STATE_DRAGGING : SCROLL_STATE_SETTLING);
@@ -380,7 +407,7 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
             return;
         }
         mTempConsumed[1] = 0;
-        scrollConsumed(0, dyUnconsumed, mTempConsumed);
+        doScrollConsumed(0, dyUnconsumed, mTempConsumed);
         int consumedY = mTempConsumed[1];
         consumed[1] += consumedY;
         final int myUnconsumedY = dyUnconsumed - consumedY;

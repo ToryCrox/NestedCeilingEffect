@@ -23,6 +23,23 @@ public class NestedChildRecyclerView extends NestedPublicRecyclerView implements
     public NestedChildRecyclerView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         setNestedScrollingEnabled(true);
+        setOverScrollMode(OVER_SCROLL_ALWAYS);
+    }
+
+    @Override
+    public void setNestedScrollingEnabled(boolean enabled) {
+        if (!enabled) {
+            throw new IllegalArgumentException("NestedChildRecyclerView must be enable nested scrolling!!");
+        }
+        super.setNestedScrollingEnabled(enabled);
+    }
+
+    @Override
+    public void setOverScrollMode(int overScrollMode) {
+        if (overScrollMode == OVER_SCROLL_NEVER) {
+            throw new IllegalArgumentException("NestedChildRecyclerView must be OVER_SCROLL_ALWAYS!!");
+        }
+        super.setOverScrollMode(overScrollMode);
     }
 
     @Override
