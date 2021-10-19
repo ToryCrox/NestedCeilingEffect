@@ -23,4 +23,12 @@
         android:text="NestedPrentRecyclerView 示例 viewPager2"
         android:layout_marginVertical="20dp" />
 
+
+    <Button
+        android:id="@+id/btn3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAllCaps="false"
+        android:text="测试"
+        android:layout_marginVertical="20dp" />
 </LinearLayout>

@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.tory.module_adapter.base.ItemSpace
 import com.tory.module_adapter.base.NormalModuleAdapter
+import com.tory.nestedceiling.app.R
 import com.tory.nestedceiling.app.utils.dp
 import com.tory.nestedceiling.app.views.*
 import com.tory.nestedceiling.widget.NestedChildRecyclerView
@@ -17,6 +18,7 @@ import com.tory.nestedceiling.widget.NestedChildRecyclerView
 class StaggeredFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val recyclerView = NestedChildRecyclerView(requireContext())
+        recyclerView.id = R.id.recycler_view
 
         val listAdapter = NormalModuleAdapter()
         listAdapter.register (gridSize = 2, itemSpace = ItemSpace(spaceH = 10.dp(), spaceV = 8.dp(), edgeH = 8.dp())) {

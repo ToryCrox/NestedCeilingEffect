@@ -1,7 +1,11 @@
 package com.tory.nestedceiling.app.views
 
 import android.content.Context
+import android.os.Bundle
+import android.os.Parcelable
 import android.util.AttributeSet
+import android.util.SparseArray
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.*
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
@@ -35,6 +39,12 @@ class LastViewPager2ItemView @JvmOverloads constructor(
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = labels[position]
         }.attach()
+        registerSaveState()
+    }
+
+    override fun onChanged(model: LastViewPager2Model) {
+        super.onChanged(model)
+        consumeSaveState()
     }
 
     private fun getPageFragments(): List<Fragment> {
@@ -44,6 +54,32 @@ class LastViewPager2ItemView @JvmOverloads constructor(
         data.add(LinearINormalFragment())
         data.add(EmptyFragment())
         return data
+    }
+
+    /**
+     *
+     */
+    fun registerSaveState() {
+        val view = this
+        activity.savedStateRegistry.registerSavedStateProvider("ss_${view.javaClass.simpleName}") {
+            val bundle = Bundle()
+            val container = SparseArray<Parcelable>()
+            bundle.putSparseParcelableArray("ss_container_${view.javaClass.simpleName}", container)
+            view.saveHierarchyState(container)
+            bundle
+        }
+    }
+
+    /**
+     * 对应的子view必须有id才能恢复成功
+     */
+    fun consumeSaveState() {
+        val view = this
+        val bundle = activity.savedStateRegistry.consumeRestoredStateForKey("ss_${view.javaClass.simpleName}")
+        val container = bundle?.getSparseParcelableArray<Parcelable>("ss_container_${view.javaClass.simpleName}")
+        if (container != null) {
+            view.restoreHierarchyState(container)
+        }
     }
 
 

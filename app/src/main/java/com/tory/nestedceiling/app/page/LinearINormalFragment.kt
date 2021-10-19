@@ -18,6 +18,7 @@ class LinearINormalFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val recyclerView = NestedChildRecyclerView(requireContext())
+        recyclerView.id = R.id.recycler_view
 
         val listAdapter = NormalModuleAdapter()
         val itemSpace = ItemSpace(spaceV = 12.dp(), edgeH = 16.dp())
