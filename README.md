@@ -1,5 +1,7 @@
 嵌套滑动的RecyclerView, fork from https://github.com/solartcc/NestedCeilingEffect
 
+实现文档: https://juejin.cn/post/7021869390832336910
+
 主要解决一下问题
 1. 多指问题
 2. fling过程中触摸view抖动问题
