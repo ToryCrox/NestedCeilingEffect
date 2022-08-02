@@ -2,10 +2,8 @@ package com.tory.nestedceiling.app.views
 
 import android.content.Context
 import android.util.AttributeSet
-import androidx.appcompat.widget.AppCompatImageView
 import com.tory.module_adapter.base.groupPosition
 import com.tory.module_adapter.views.AbsModuleView
-import com.tory.nestedceiling.app.R
 import com.tory.nestedceiling.app.utils.MaterialColor
 import com.tory.nestedceiling.app.utils.dp
 import kotlin.random.Random

@@ -1,15 +1,11 @@
 package com.tory.nestedceiling.app.adapter
 
-import android.os.Build
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.tory.nestedceiling.app.utils.MaterialColor
 import com.youth.banner.adapter.BannerAdapter
-import com.youth.banner.util.BannerUtils
 
 class BannerImageAdapter(imageUrls: List<MaterialColor>) : BannerAdapter<MaterialColor, BannerImageAdapter.ImageHolder>(imageUrls) {
 

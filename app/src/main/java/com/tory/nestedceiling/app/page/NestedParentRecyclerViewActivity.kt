@@ -1,22 +1,21 @@
 package com.tory.nestedceiling.app.page
 
-import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.tory.nestedceiling.app.R
-import com.tory.nestedceiling.app.model.*
-import com.tory.nestedceiling.widget.NestedParentRecyclerView
-import com.tory.nestedceiling.widget.OnChildAttachStateListener
 import com.tory.module_adapter.base.NormalModuleAdapter
 import com.tory.module_adapter.views.ModuleEmptyModel
 import com.tory.nestedceiling.app.utils.MaterialColor
-import com.tory.nestedceiling.app.utils.dp
 import com.tory.nestedceiling.app.views.*
+import com.tory.nestedceiling.app.utils.dp
+import com.tory.nestedceiling.widget.NestedParentRecyclerView
+import com.tory.nestedceiling.widget.OnChildAttachStateListener
 import java.util.*
 
 class NestedParentRecyclerViewActivity : AppCompatActivity() {
@@ -28,6 +27,9 @@ class NestedParentRecyclerViewActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_nestedrecyclerview)
+
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
 
         val listAdapter = NormalModuleAdapter()
         listAdapter.register {
@@ -74,7 +76,7 @@ class NestedParentRecyclerViewActivity : AppCompatActivity() {
         }
         listAdapter.setItems(data)
 
-        recyclerView.addOnChildAttachStateListener(object :OnChildAttachStateListener{
+        recyclerView.addOnChildAttachStateListener(object : OnChildAttachStateListener {
             override fun onChildDetachedFromTop() {
                 topAnchor.visibility = View.GONE
             }
@@ -96,5 +98,13 @@ class NestedParentRecyclerViewActivity : AppCompatActivity() {
             }
 
         })
+    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+        if (id == android.R.id.home) {
+            onBackPressed()
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 }

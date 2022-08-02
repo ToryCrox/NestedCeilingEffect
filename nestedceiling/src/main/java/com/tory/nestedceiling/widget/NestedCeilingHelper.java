@@ -11,7 +11,6 @@ import com.tory.nestedceiling.R;
 /**
  * - Author: xutao
  * - Date: 2021/9/18
- * - Email: xutao@shizhuang-inc.com
  * - Description:
  */
 public class NestedCeilingHelper {

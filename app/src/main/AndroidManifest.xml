@@ -19,6 +19,8 @@
             </intent-filter>
         </activity>
         <activity android:name="com.tory.nestedceiling.app.page.NestedParentRecyclerViewActivity" />
+        <activity android:name=".page.TransparentToolbarActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
 
     </application>
 </manifest>

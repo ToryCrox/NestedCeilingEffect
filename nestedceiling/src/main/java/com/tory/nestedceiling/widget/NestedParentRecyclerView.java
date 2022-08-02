@@ -49,6 +49,8 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
 
     private boolean mIsChildNestedScrolling = false;
 
+    private int[] mTempLocation = new int[2];
+
     public NestedParentRecyclerView(@NonNull Context context) {
         this(context, null);
     }
@@ -71,7 +73,7 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
     @Override
     public void setOverScrollMode(int overScrollMode) {
         if (overScrollMode == OVER_SCROLL_NEVER) {
-            throw new IllegalArgumentException("NestedChildRecyclerView must be OVER_SCROLL_ALWAYS!!");
+            // throw new IllegalArgumentException("NestedChildRecyclerView must be OVER_SCROLL_ALWAYS!!");
         }
         super.setOverScrollMode(overScrollMode);
     }
@@ -82,15 +84,15 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
 
     /**
      * 距离嵌套滑动距离顶部应该流出的空间
+     *
      * @param topOffset
      */
     public void setTopOffset(int topOffset) {
         this.mTopOffset = topOffset;
-        if (mContentView != null){
+        if (mContentView != null) {
             mContentView.requestLayout();
         }
     }
-
 
     public void addOnChildAttachStateListener(OnChildAttachStateListener listener) {
         mOnChildAttachStateListeners.add(listener);
@@ -132,9 +134,20 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent e) {
-        boolean isTouchInChildArea =  (mContentView != null) && (e.getY() > mContentView.getTop())
-                && (e.getY() < mContentView.getBottom())
-                && FindTarget.findChildScrollTarget(mContentView) != null;
+        boolean isTouchInContent = (mContentView != null) && (e.getY() > mContentView.getTop())
+                && (e.getY() < mContentView.getBottom());
+        View targetView = isTouchInContent ? FindTarget.findChildScrollTarget(mContentView) : null;
+        boolean isTouchInChildArea = false;
+        if (targetView != null) {
+            targetView.getLocationOnScreen(mTempLocation);
+            int left = mTempLocation[0];
+            int top = mTempLocation[1];
+            int right = left + targetView.getWidth();
+            int bottom = top + targetView.getHeight();
+            float x = e.getRawX();
+            float y = e.getRawY();
+            isTouchInChildArea = x >= left && x <= right && y >= top && y <= bottom;
+        }
         // 此控件滑动到底部或者触摸区域在子嵌套布局不拦截事件
         if (isTouchInChildArea) {
             if (getScrollState() == SCROLL_STATE_SETTLING) {
@@ -363,7 +376,7 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
             return;
         }
         // 向上滑动且此控件没有滑动到底部时，需要让此控件继续滑动以保证滑动连贯一致性
-        boolean needKeepScroll = dy > 0 && !isScrollEnd();
+        boolean needKeepScroll = dy > 0; //&& !isScrollEnd();
         if (needKeepScroll) {
             mTempConsumed[1] = 0;
             doScrollConsumed(0, dy, mTempConsumed);
@@ -372,7 +385,17 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
             updateScrollState(type == ViewCompat.TYPE_TOUCH ? SCROLL_STATE_DRAGGING : SCROLL_STATE_SETTLING);
 
             if (NestedCeilingHelper.DEBUG) {
-                log("onNestedPreScroll dy:" + dy + ", consumedY: " + consumed[1] + ", type:" + type);
+                final int offset = computeVerticalScrollOffset();
+                final int range = computeVerticalScrollRange() - computeVerticalScrollExtent();
+                log("onNestedPreScroll dy:" + dy + ", consumedY: " + consumed[1]
+                        + ", type:" + type + ", isScrollEnd: " + isScrollEnd() + ", offset:" + offset + ", range:" + range);
+            }
+        } else {
+            if (NestedCeilingHelper.DEBUG) {
+                final int offset = computeVerticalScrollOffset();
+                final int range = computeVerticalScrollRange() - computeVerticalScrollExtent();
+                log("onNestedPreScroll not dy:" + dy + ", type:" + type
+                        + ", isScrollEnd: " + isScrollEnd() + ", offset:" + offset + ", range:" + range);
             }
         }
     }
@@ -397,6 +420,7 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
 
     /**
      * dyUnconsumed != 0时，嵌套的子view，表示嵌套的子view不能滑动，也就是到顶了，大于0表示下滑，小于0表示上划
+     *
      * @param target
      * @param dyUnconsumed
      * @param type
@@ -448,7 +472,6 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
         }
     }
 
-
     @Override
     public void onStopNestedScroll(@NonNull View target, int type) {
         if (NestedCeilingHelper.DEBUG) {
@@ -460,7 +483,7 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
             stopScroll();
         } else if (getFlingOverScroll() != null && getFlingOverScroll().isFinished()
                 && target instanceof NestedChildRecyclerView
-                && ((NestedChildRecyclerView) target).getScrollState() == SCROLL_STATE_IDLE){
+                && ((NestedChildRecyclerView) target).getScrollState() == SCROLL_STATE_IDLE) {
             // 嵌套滑动停止时要将状态至为idle状态
             //((NestedChildRecyclerView) target).getScrollState() ==
             updateScrollState(SCROLL_STATE_IDLE);
@@ -470,7 +493,6 @@ public class NestedParentRecyclerView extends NestedPublicRecyclerView implement
         mIsChildNestedScrolling = false;
     }
     // NestedScrollingParent
-
 
     @Override
     public void onStopNestedScroll(@NonNull View target) {

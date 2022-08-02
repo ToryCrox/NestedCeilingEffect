@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.tory.module_adapter.base.ItemSpace
-import com.tory.nestedceiling.app.R
 import com.tory.module_adapter.base.NormalModuleAdapter
 import com.tory.nestedceiling.app.utils.MaterialColor
 import com.tory.nestedceiling.app.utils.dp
@@ -18,7 +17,6 @@ class LinearINormalFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val recyclerView = NestedChildRecyclerView(requireContext())
-        recyclerView.id = R.id.recycler_view
 
         val listAdapter = NormalModuleAdapter()
         val itemSpace = ItemSpace(spaceV = 12.dp(), edgeH = 16.dp())

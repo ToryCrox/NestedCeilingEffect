@@ -29,7 +29,7 @@ public class NestedChildRecyclerView extends NestedPublicRecyclerView implements
     @Override
     public void setNestedScrollingEnabled(boolean enabled) {
         if (!enabled) {
-            throw new IllegalArgumentException("NestedChildRecyclerView must be enable nested scrolling!!");
+            // throw new IllegalArgumentException("NestedChildRecyclerView must be enable nested scrolling!!");
         }
         super.setNestedScrollingEnabled(enabled);
     }
@@ -37,7 +37,7 @@ public class NestedChildRecyclerView extends NestedPublicRecyclerView implements
     @Override
     public void setOverScrollMode(int overScrollMode) {
         if (overScrollMode == OVER_SCROLL_NEVER) {
-            throw new IllegalArgumentException("NestedChildRecyclerView must be OVER_SCROLL_ALWAYS!!");
+            // throw new IllegalArgumentException("NestedChildRecyclerView must be OVER_SCROLL_ALWAYS!!");
         }
         super.setOverScrollMode(overScrollMode);
     }
@@ -47,3 +47,4 @@ public class NestedChildRecyclerView extends NestedPublicRecyclerView implements
         super.onMeasure(widthSpec, heightSpec);
     }
 }
+
